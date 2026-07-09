@@ -129,18 +129,23 @@ function ToggleSwitch({
 
 function PanelChrome({ children }: { children: React.ReactNode }) {
   return (
-    <div className={styles.panel}>
+    <div className={`${styles.panel} ${styles.bayBoard}`}>
       <div className={styles.panelBezel} aria-hidden="true">
-        <span className={styles.screw} />
-        <span className={styles.screw} />
-        <span className={styles.panelTitle}>CONTROL</span>
-        <span className={styles.screw} />
-        <span className={styles.screw} />
+        <span className={styles.bayDot} />
+        <span className={styles.panelTitle}>SERVICE BAY BOARD</span>
+        <span className={styles.bayDot} />
+      </div>
+      <div className={styles.bayRow} aria-hidden="true">
+        {[1, 2, 3, 4].map((n) => (
+          <span key={n} className={`${styles.bayChip} ${n <= 3 ? styles.bayOpen : styles.bayBusy}`}>
+            Bay {n}
+          </span>
+        ))}
       </div>
       <div className={styles.panelStatus} aria-hidden="true">
         <span className={styles.statusLed} />
-        <span className={styles.statusText}>SYSTEM ACTIVE</span>
-        <span className={styles.statusTime}>LIVE</span>
+        <span className={styles.statusText}>3 BAYS OPEN</span>
+        <span className={styles.statusTime}>ASE</span>
       </div>
       <div className={styles.panelBody}>{children}</div>
     </div>

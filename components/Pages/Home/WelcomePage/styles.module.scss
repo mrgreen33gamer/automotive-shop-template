@@ -229,7 +229,7 @@
   }
 }
 
-// ── Control panel chrome ───────────────────────────────────────────────────
+// ── Service Bay Board ──────────────────────────────────────────────────────
 
 .panel {
   width: min(100%, 400px);
@@ -241,6 +241,70 @@
     0 0 0 1px rgba(0, 0, 0, 0.4),
     0 28px 56px rgba(0, 0, 0, 0.45);
   overflow: hidden;
+}
+
+.bayBoard {
+  border-radius: 4px;
+  border: 2px solid rgba($orange, 0.35);
+  background:
+    linear-gradient(90deg, rgba($orange, 0.06) 0 4px, transparent 4px),
+    linear-gradient(165deg, #221816 0%, #141010 55%, #100c0c 100%);
+}
+
+.bayDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $orange;
+  box-shadow: 0 0 8px rgba($orange, 0.6);
+  flex-shrink: 0;
+}
+
+.bayRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba($white, 0.06);
+}
+
+.bayChip {
+  text-align: center;
+  font-family: $textFont;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.2rem;
+  border-radius: 3px;
+  border: 1px solid rgba($white, 0.1);
+}
+
+.bayOpen {
+  color: #3ddc84;
+  background: rgba(#3ddc84, 0.1);
+  border-color: rgba(#3ddc84, 0.35);
+}
+
+.bayBusy {
+  color: rgba($orange, 0.9);
+  background: rgba($orange, 0.12);
+  border-color: rgba($orange, 0.4);
+}
+
+.bayBoard .panelBezel {
+  background: linear-gradient(180deg, #3a2018 0%, #221410 100%);
+  border-bottom-color: rgba($orange, 0.2);
+}
+
+.bayBoard .panelTitle {
+  letter-spacing: 0.14em;
+  color: rgba($orange, 0.85);
+}
+
+.bayBoard .meterFill {
+  background: linear-gradient(90deg, #991b1b, $orange, #fca5a5);
 }
 
 .panelBezel {
@@ -618,3 +682,27 @@
 }
 
 /* end identity layer */
+
+/* === HERO PATTERN UNIQUENESS — automotive-shop-template === */
+.hero {
+  &::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba($white, 0.015) 3px, rgba($white, 0.015) 4px) !important;
+    background-size: auto !important;
+    opacity: 0.78 !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+
+  &::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background-image: radial-gradient(ellipse 50% 40% at 67% 39%, rgba($orange, 0.065), transparent 70%), radial-gradient(ellipse 40% 50% at 78% 78%, rgba($white, 0.03), transparent 65%) !important;
+    pointer-events: none !important;
+    z-index: 0 !important;
+  }
+}
+/* end hero pattern */
