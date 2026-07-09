@@ -45,36 +45,42 @@ export default function HomePage() {
       title: "Oil Change & Maintenance",
       body: "Full-synthetic and conventional oil changes, multi-point inspection on every visit. Most vehicles in and out in under 30 minutes.",
       link: "/services/oil-change-maintenance",
+      image: "/pages/home/services/service-1.jpg",
     },
     {
       icon: faFire,
       title: "Brake Repair & Replacement",
       body: "Pads, rotors, calipers, and full brake system diagnostics — repaired fast with a free brake inspection on every visit.",
       link: "/services/brake-repair",
+      image: "/pages/home/services/service-2.jpg",
     },
     {
       icon: faWrench,
       title: "Engine Diagnostics",
       body: "Check engine light on? Computerized diagnostics pinpoint the real issue. We never recommend work your vehicle doesn't need.",
       link: "/services/engine-diagnostics",
+      image: "/pages/home/services/service-3.jpg",
     },
     {
       icon: faFilter,
       title: "Transmission Service",
       body: "Fluid flushes, filter replacement, and full transmission diagnostics — protects one of the most expensive systems in your vehicle.",
       link: "/services/transmission-service",
+      image: "/pages/home/services/service-4.jpg",
     },
     {
       icon: faThermometerHalf,
       title: "AC & Heating Repair",
       body: "Blowing warm in summer or cold in winter? We diagnose and repair your vehicle's climate system fast, with upfront flat-rate pricing.",
       link: "/services/ac-heating-repair",
+      image: "/pages/home/services/service-1.jpg",
     },
     {
       icon: faWind,
       title: "Tire Service & Wheel Alignment",
       body: "Rotations, replacements, and precision wheel alignment. Even wear, better mileage, and a smoother ride in every lane.",
       link: "/services/tire-service",
+      image: "/pages/home/services/service-2.jpg",
     },
   ];
 
@@ -210,16 +216,16 @@ export default function HomePage() {
 
   return (
     <main className={styles.pageWrapper}>
-
-      {/* 1. Hero */}
       <WelcomePage />
-
-      {/* 2. Scrolling trust strip — immediately after hero */}
       <TrustBar
         headline="Franklin's trusted auto repair shop — ASE certified, insured, and warrantied on every job"
       />
-
-      {/* 3. Impact metrics — build credibility before pitching services */}
+      <div className={styles.section}>
+        <ServiceCardComponent
+          heading="Complete Auto Repair Services for Your Vehicle"
+          cards={services}
+        />
+      </div>
       <div className={styles.section}>
         <ImpactMetrics
           title="Numbers That Speak for Us"
@@ -227,16 +233,6 @@ export default function HomePage() {
           cityName="Franklin"
         />
       </div>
-
-      {/* 4. Services grid */}
-      <div className={styles.section}>
-        <ServiceCardComponent
-          heading="Complete Auto Repair Services for Your Vehicle"
-          cards={services}
-        />
-      </div>
-
-      {/* 5. Why Choose Us */}
       <div className={styles.section}>
         <WhyChooseUs
           cityName="Franklin"
@@ -244,8 +240,49 @@ export default function HomePage() {
           title="What Makes Redline Different"
         />
       </div>
-
-      {/* 14. Contact form — final conversion point */}
+      <div className={styles.section}>
+        <ProcessTimeline steps={processSteps} />
+      </div>
+      <div className={styles.section}>
+        <Testimonials testimonials={reviews} />
+      </div>
+      <CTABanner
+        headline="Honest Auto Repair. No Surprises."
+        subline="Diagnostics, brakes, engines, and maintenance — digital inspections and written quotes before any wrench turns."
+        primaryText="Call (615) 900-6400"
+        primaryLink="tel:+16159006400"
+        secondaryText="Schedule Service"
+        secondaryLink="/contact"
+      
+        imageSrc="/pages/home/welcome/hero-main.jpg"
+       />
+      <div className={styles.section}>
+        <GuaranteeSection />
+      </div>
+      <div className={styles.section}>
+        <LocalServiceAreas
+          cityName="Franklin"
+          areas={localAreas}
+          servicePath=""
+          title="Serving All of Middle Tennessee"
+        />
+      </div>
+      <div className={styles.section}>
+        <WhatToExpect
+          sectionTitle="Every Service Visit, Every Time"
+          expectations={expectations}
+        />
+      </div>
+      <div className={styles.section}>
+        <FAQ
+          cityName="Franklin"
+          faq={faq}
+          title="Auto Repair Questions — Answered Straight"
+        />
+      </div>
+      <div className={styles.section}>
+        <BlogPreviewGrid />
+      </div>
       <div className={styles.section}>
         <Variant4
           title="Request Service or a Free Quote"
@@ -255,65 +292,6 @@ export default function HomePage() {
           formVariant={2}
         />
       </div>
-
-      {/* 7. How it works — process after the CTA so urgency is set */}
-      <div className={styles.section}>
-        <ProcessTimeline steps={processSteps} />
-      </div>
-
-      {/* 8. Social proof — reviews before the guarantee promise */}
-      <div className={styles.section}>
-        <Testimonials testimonials={reviews} />
-      </div>
-
-      {/* 9. Guarantee — peer validation already done, now make the promise */}
-      <div className={styles.section}>
-        <GuaranteeSection />
-      </div>
-
-      {/* 6. Mid-page CTA — urgency hook before process details */}
-      <CTABanner
-        headline="Need Your Vehicle Fixed Right? Call Us Right Now."
-        subline="Same-day appointments across Franklin, Brentwood, Nashville, Spring Hill, and all of Middle Tennessee. Flat-rate pricing. 3-year / 36,000-mile warranty."
-        primaryText="Call (615) 900-6400"
-        primaryLink="tel:+16159006400"
-        secondaryText="Book Online"
-        secondaryLink="/contact"
-      />
-
-
-      {/* 10. Service areas */}
-      <div className={styles.section}>
-        <LocalServiceAreas
-          cityName="Franklin"
-          areas={localAreas}
-          servicePath=""
-          title="Serving All of Middle Tennessee"
-        />
-      </div>
-
-      {/* 11. What to expect (detail reassurance — lower in page) */}
-      <div className={styles.section}>
-        <WhatToExpect
-          sectionTitle="Every Service Visit, Every Time"
-          expectations={expectations}
-        />
-      </div>
-
-      {/* 12. FAQ */}
-      <div className={styles.section}>
-        <FAQ
-          cityName="Franklin"
-          faq={faq}
-          title="Auto Repair Questions — Answered Straight"
-        />
-      </div>
-
-      {/* 13. Blog preview — educational content before the final form */}
-      <div className={styles.section}>
-        <BlogPreviewGrid />
-      </div>
-
     </main>
   );
 }

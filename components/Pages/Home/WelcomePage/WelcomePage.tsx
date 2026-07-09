@@ -1,189 +1,336 @@
+// _archetype-library/hero-g-dashboard/Component.tsx
+//
+// Hero G: Live Control Panel — industrial chrome, counting gauges from props,
+// toggle switches, small meters. Framer-motion for counter animations.
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from 'react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import Link from 'next/link';
+import { PhoneIcon, ChevronIcon, CheckIcon } from './_shared/icons';
 import styles from './styles.module.scss';
 
-// ── Spark canvas ──────────────────────────────────────────────────────────────
-function ParticleCanvas() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = ref.current; if (!canvas) return;
-    const ctx = canvas.getContext('2d'); if (!ctx) return;
-    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
-    resize(); window.addEventListener('resize', resize);
-    const pts = Array.from({ length: 38 }, () => ({
-      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-      r: Math.random() * 2.4 + 0.5, vx: (Math.random() - 0.5) * 0.6,
-      vy: -(Math.random() * 0.3 + 0.08), o: Math.random() * 0.35 + 0.7,
-    }));
-    let raf: number;
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      pts.forEach(p => {
-        ctx.save(); ctx.globalAlpha = p.o;
-        ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-        p.x += p.vx; p.y += p.vy;
-        if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
-        if (p.x < -10) p.x = canvas.width + 10;
-        if (p.x > canvas.width + 10) p.x = -10;
-      });
-      raf = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
-  }, []);
-  return <canvas ref={ref} className={styles.particleCanvas} aria-hidden="true" />;
+function parseGaugeValue(raw: string): { numeric: number | null; prefix: string; suffix: string } {
+  const match = raw.match(/^([^0-9.-]*)(-?[\d.]+)(.*)$/);
+  if (!match) return { numeric: null, prefix: '', suffix: raw };
+  const num = parseFloat(match[2]);
+  if (Number.isNaN(num)) return { numeric: null, prefix: '', suffix: raw };
+  return { numeric: num, prefix: match[1], suffix: match[3] };
 }
 
-// ── Performance gauge ─────────────────────────────────────────────────────────
-function PerformanceGauge() {
-  const [fill, setFill] = useState(0);
-  useEffect(() => { const t = setTimeout(() => setFill(98), 750); return () => clearTimeout(t); }, []);
+function CountingValue({
+  value,
+  unit,
+  delay = 0,
+}: {
+  value: string;
+  unit?: string;
+  delay?: number;
+}) {
+  const parsed = useMemo(() => parseGaugeValue(value), [value]);
+  const motionVal = useMotionValue(0);
+  const display = useTransform(motionVal, (v) => {
+    if (parsed.numeric === null) return value;
+    const decimals = String(parsed.numeric).includes('.')
+      ? (String(parsed.numeric).split('.')[1]?.length ?? 0)
+      : 0;
+    const rounded = decimals > 0 ? v.toFixed(decimals) : String(Math.round(v));
+    return `${parsed.prefix}${rounded}${parsed.suffix}`;
+  });
+  const [text, setText] = useState(parsed.numeric === null ? value : `${parsed.prefix}0${parsed.suffix}`);
+
+  useEffect(() => {
+    if (parsed.numeric === null) {
+      setText(value);
+      return;
+    }
+    const controls = animate(motionVal, parsed.numeric, {
+      duration: 1.6,
+      delay,
+      ease: [0.22, 1, 0.36, 1],
+    });
+    const unsub = display.on('change', (v) => setText(v));
+    return () => {
+      controls.stop();
+      unsub();
+    };
+  }, [parsed.numeric, value, delay, motionVal, display]);
+
   return (
-    <div className={styles.thermo} aria-hidden="true">
-      {/* tube + bulb stacked in normal flow → reliable centering */}
-      <div className={styles.thermoColumn}>
-        <div className={styles.thermoTube}>
-          <motion.div
-            className={styles.thermoFill}
-            initial={{ height: '0%' }}
-            animate={{ height: `${fill}%` }}
-            transition={{ duration: 2.0, delay: 0.85, ease: [0.34, 1.2, 0.64, 1] }}
-          />
-        </div>
-        <div className={styles.thermoBulb} />
+    <span className={styles.gaugeValue}>
+      {text}
+      {unit ? <span className={styles.gaugeUnit}>{unit}</span> : null}
+    </span>
+  );
+}
+
+function GaugeRow({
+  label,
+  value,
+  unit,
+  index,
+}: {
+  label: string;
+  value: string;
+  unit?: string;
+  index: number;
+}) {
+  const parsed = useMemo(() => parseGaugeValue(value), [value]);
+  const pct = parsed.numeric !== null
+    ? Math.min(100, Math.max(8, Math.abs(parsed.numeric) > 100 ? 72 : Math.abs(parsed.numeric)))
+    : 55 + (index % 3) * 12;
+
+  return (
+    <div className={styles.gauge}>
+      <div className={styles.gaugeHeader}>
+        <span className={styles.gaugeLabel}>{label}</span>
+        <CountingValue value={value} unit={unit} delay={0.45 + index * 0.12} />
       </div>
-      {/* labels aligned to tube height */}
-      <div className={styles.thermoLabels}>
-        <span className={styles.thermoTop}>100%</span>
-        <span className={styles.thermoMid}>Satisfaction</span>
-        <span className={styles.thermoBot}>0%</span>
+      <div className={styles.meterTrack} aria-hidden="true">
+        <motion.div
+          className={styles.meterFill}
+          initial={{ width: '0%' }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 1.35, delay: 0.5 + index * 0.1, ease: [0.34, 1.1, 0.64, 1] }}
+        />
+        <div className={styles.meterTicks}>
+          {[0, 1, 2, 3, 4].map((t) => (
+            <span key={t} className={styles.meterTick} />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-const CHIPS = ['Same-Day Service', 'No Contracts', 'ASE Certified', '13+ Yrs Local', '3-Yr/36k Warranty'];
+function ToggleSwitch({
+  label,
+  on,
+  index,
+}: {
+  label: string;
+  on: boolean;
+  index: number;
+}) {
+  return (
+    <motion.div
+      className={`${styles.toggle} ${on ? styles.toggleOn : styles.toggleOff}`}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.7 + index * 0.08 }}
+    >
+      <span className={styles.toggleLabel}>{label}</span>
+      <span className={styles.toggleTrack} aria-hidden="true">
+        <span className={styles.toggleThumb} />
+      </span>
+      <span className={styles.toggleState}>{on ? 'ON' : 'OFF'}</span>
+    </motion.div>
+  );
+}
+
+function PanelChrome({ children }: { children: React.ReactNode }) {
+  return (
+    <div className={styles.panel}>
+      <div className={styles.panelBezel} aria-hidden="true">
+        <span className={styles.screw} />
+        <span className={styles.screw} />
+        <span className={styles.panelTitle}>CONTROL</span>
+        <span className={styles.screw} />
+        <span className={styles.screw} />
+      </div>
+      <div className={styles.panelStatus} aria-hidden="true">
+        <span className={styles.statusLed} />
+        <span className={styles.statusText}>SYSTEM ACTIVE</span>
+        <span className={styles.statusTime}>LIVE</span>
+      </div>
+      <div className={styles.panelBody}>{children}</div>
+    </div>
+  );
+}
 
 export default function WelcomePage() {
+const badgeText = 'Franklin\'s Most Trusted Auto Shop — Since 2012';
+const headlineLines = [
+  'Fast Fix.',
+  'Fair Price.',
+];
+const headlineAccent = 'Redline.';
+const subheadline = 'Flat-rate pricing. Same-day service. 3-year / 36,000-mile warranty on every repair. Serving Franklin and Middle Tennessee with licensed, ASE certified technicians.';
+const primaryCta = { label: 'Call (615) 900-6400', href: 'tel:+16159006400' };
+const secondaryCta = { label: 'Free Estimate', href: '/contact' };
+const chips = [
+  'Same-Day Service',
+  'No Contracts',
+  'ASE Certified',
+  '13+ Yrs Local',
+  '3-Yr/36k Warranty',
+];
+const stats = [
+  {
+    "value": "12,000+",
+    "label": "Vehicles Serviced"
+  },
+  {
+    "value": "4.9 ★",
+    "label": "Google Rating"
+  },
+  {
+    "value": "3-Yr/36k",
+    "label": "Warranty Included"
+  },
+  {
+    "value": "Same-Day",
+    "label": "Service Available"
+  }
+];
+const meterTarget = 72;
+const meterTopLabel = "Peak";
+const meterMidLabel = "Local";
+const meterBotLabel = "Base";
+const particleColor = '#ef4444';
+const beforeImageSrc = '/pages/home/welcome/before.jpg';
+const afterImageSrc = '/pages/home/welcome/after.jpg';
+const beforeLabel = "Check engine";
+const afterLabel = "Road ready";
+const mapCenterLabel = 'Service HQ';
+const mapPins = [
+  { label: 'Waco', x: 42, y: 48 },
+  { label: 'Temple', x: 68, y: 62 },
+  { label: 'Killeen', x: 58, y: 72 },
+];
+const coverageLabel = 'Central Texas coverage';
+const materials = [
+  { name: "Brakes", swatch: "#ef4444", imageSrc: "/pages/home/welcome/mat-1.jpg" },
+  { name: "Engine", swatch: "#f87171", imageSrc: "/pages/home/welcome/mat-2.jpg" },
+  { name: "Tires", swatch: "#b91c1c", imageSrc: "/pages/home/welcome/mat-3.jpg" },
+  { name: "AC", swatch: "#fecaca", imageSrc: "/pages/home/welcome/mat-1.jpg" },
+  { name: "Electrical", swatch: "#991b1b", imageSrc: "/pages/home/welcome/mat-2.jpg" },
+  { name: "Fleet", swatch: "#450a0a", imageSrc: "/pages/home/welcome/mat-3.jpg" }
+];
+const quote = "They showed me the inspection photos and fixed exactly what was wrong. No mystery fees.";
+const authorName = "Angela R.";
+const authorMeta = "Brake service · Georgetown";
+const rating = 5;
+const schematicLabel = "Redline schematic";
+const gauges = [
+  { label: "Jobs", value: "8,500+" },
+  { label: "Rating", value: "4.8 ★" },
+  { label: "Bay wait", value: "Often same day" },
+  { label: "Warranty", value: "12/12k" }
+];
+const toggles = [
+  { label: "Licensed crew", on: true },
+  { label: "Same-week", on: true },
+  { label: "Warrantied", on: true }
+];
+const textureSrc = '/pages/home/welcome/hero-main.jpg';
+const textureAlt = 'Texture';
+const accentWord = "Redline";
+
+  // Stable serial for SSR/hydration — avoid Math.random in render of serial
+  // by using a fixed-looking decorative suffix derived from gauge count.
+  const serial = `CH-${String(gauges.length).padStart(2, '0')}`;
+
   return (
     <section className={styles.hero} aria-label="Hero">
-      <ParticleCanvas />
       <div className={styles.shard} aria-hidden="true" />
 
       <div className={styles.layout}>
-
-        {/* LEFT ── text */}
         <div className={styles.content}>
-          <motion.div className={styles.badge}
-            initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}>
+          <motion.div
+            className={styles.badge}
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <span className={styles.badgeDot} />
-            Franklin&apos;s Most Trusted Auto Shop — Since 2012
+            {badgeText}
           </motion.div>
 
-          <motion.h1 className={styles.headline}
-            initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}>
-            Fast Fix.<br />Fair Price.<br />
-            <span className={styles.accentLine}>Redline.</span>
+          <motion.h1
+            className={styles.headline}
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {headlineLines.map((line, i) => (
+              <React.Fragment key={i}>{line}<br /></React.Fragment>
+            ))}
+            <span className={styles.accentLine}>{headlineAccent}</span>
           </motion.h1>
 
-          <motion.p className={styles.sub}
-            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.22 }}>
-            Flat-rate pricing. Same-day service. 3-year / 36,000-mile warranty on every repair.
-            Serving Franklin and Middle Tennessee with licensed, ASE certified technicians.
+          <motion.p
+            className={styles.sub}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.22 }}
+          >
+            {subheadline}
           </motion.p>
 
-          <motion.div className={styles.ctaRow}
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.34 }}>
-            <a href="tel:+16159006400" className={styles.ctaPrimary}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.17 12a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 3.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-              Call (615) 900-6400
+          <motion.div
+            className={styles.ctaRow}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.34 }}
+          >
+            <a href={primaryCta.href} className={styles.ctaPrimary}>
+              <PhoneIcon size={15} /> {primaryCta.label}
             </a>
-            <Link href="/contact" className={styles.ctaSecondary}>
-              Free Estimate
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
+            <Link href={secondaryCta.href} className={styles.ctaSecondary}>
+              {secondaryCta.label} <ChevronIcon size={12} />
             </Link>
           </motion.div>
 
-          <motion.div className={styles.chips}
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.48 }}>
-            {CHIPS.map(c => (
+          <motion.div
+            className={styles.chips}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.48 }}
+          >
+            {chips.map((c) => (
               <span key={c} className={styles.chip}>
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
-                {c}
+                <CheckIcon size={9} /> {c}
               </span>
             ))}
           </motion.div>
         </div>
 
-        {/* RIGHT ── visual widget */}
         <motion.div
           className={styles.visual}
-          initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.28, ease: 'easeOut' }}
-          aria-hidden="true"
         >
-          {/* bg steering wheel */}
-          <motion.div className={styles.bgFlake}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 65, repeat: Infinity, ease: 'linear' }}>
-            <svg width="420" height="420" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.3" strokeLinecap="round">
-              <circle cx="12" cy="12" r="10"/>
-              <circle cx="12" cy="12" r="2.4"/>
-              <line x1="12" y1="2" x2="12" y2="8.5"/>
-              <line x1="4.2" y1="16.5" x2="9.6" y2="13.4"/>
-              <line x1="19.8" y1="16.5" x2="14.4" y2="13.4"/>
-            </svg>
-          </motion.div>
-
-          {/* ── stat card: systems serviced — upper left ── */}
-          <motion.div className={`${styles.statCard} ${styles.sc1}`}
-            initial={{ opacity: 0, y: -10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 1.05, type: 'spring', stiffness: 240, damping: 18 }}>
-            <span className={styles.scNum}>12,000+</span>
-            <span className={styles.scLbl}>Vehicles Serviced</span>
-          </motion.div>
-
-          {/* ── stat card: rating — upper right ── */}
-          <motion.div className={`${styles.statCard} ${styles.sc2}`}
-            initial={{ opacity: 0, y: -10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 1.2, type: 'spring', stiffness: 240, damping: 18 }}>
-            <span className={styles.scNum}>4.9 ★</span>
-            <span className={styles.scLbl}>Google Rating</span>
-          </motion.div>
-
-          {/* ── performance gauge — dead center ── */}
-          <PerformanceGauge />
-
-          {/* ── stat card: warranty — lower left ── */}
-          <motion.div className={`${styles.statCard} ${styles.sc3}`}
-            initial={{ opacity: 0, y: 10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 1.35, type: 'spring', stiffness: 240, damping: 18 }}>
-            <span className={styles.scNum}>3-Yr/36k</span>
-            <span className={styles.scLbl}>Warranty Included</span>
-          </motion.div>
-
-          {/* ── stat card: same-day — lower right, orange ── */}
-          <motion.div className={`${styles.statCard} ${styles.sc4} ${styles.scOrange}`}
-            initial={{ opacity: 0, y: 10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 1.5, type: 'spring', stiffness: 240, damping: 18 }}>
-            <span className={styles.scNum}>Same-Day</span>
-            <span className={styles.scLbl}>Service Available</span>
-          </motion.div>
-
+          <PanelChrome>
+            <div className={styles.gaugeList}>
+              {gauges.map((g, i) => (
+                <GaugeRow
+                  key={g.label}
+                  label={g.label}
+                  value={g.value}
+                  unit={undefined}
+                  index={i}
+                />
+              ))}
+            </div>
+            {toggles.length > 0 && (
+              <div className={styles.toggleList}>
+                {toggles.map((t, i) => (
+                  <ToggleSwitch key={t.label} label={t.label} on={t.on} index={i} />
+                ))}
+              </div>
+            )}
+            <div className={styles.panelFooterStatic} aria-hidden="true">
+              <div className={styles.miniMeter}>
+                <span className={styles.miniMeterBar} />
+                <span className={styles.miniMeterBar} />
+                <span className={styles.miniMeterBar} />
+                <span className={styles.miniMeterBar} />
+                <span className={styles.miniMeterBar} />
+              </div>
+              <span className={styles.footerSerial}>{serial}</span>
+            </div>
+          </PanelChrome>
         </motion.div>
       </div>
     </section>
