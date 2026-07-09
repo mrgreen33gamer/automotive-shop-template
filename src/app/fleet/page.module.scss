@@ -1,0 +1,102 @@
+// src/app/fleet/page.module.scss
+@use 'sass:color';
+@use '../globalVariables.scss' as *;
+
+.pageWrapper {
+  min-height: 100vh;
+  background: transparent;
+  padding-bottom: 4rem;
+}
+
+.section {
+  margin-bottom: 5rem;
+}
+
+.segmentIntro {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+}
+
+.segmentEyebrow {
+  display: block;
+  font-family: $headerFont;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $orange;
+  margin-bottom: 0.6rem;
+}
+
+.segmentTitle {
+  font-family: $titleFont;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: $white;
+  margin: 0;
+}
+
+.segmentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.segmentCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.75rem;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+
+  &:hover {
+    border-color: $orange;
+    transform: translateY(-2px);
+  }
+}
+
+.segmentIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220, 38, 38, 0.12);
+  color: $orange;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.segmentIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.segmentCardTitle {
+  font-family: $headerFont;
+  font-size: 1.05rem;
+  color: $white;
+  margin: 0 0 0.5rem;
+}
+
+.segmentCardDesc {
+  font-family: $textFont;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: $lightgrey;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  .segmentGrid {
+    grid-template-columns: 1fr;
+  }
+}
