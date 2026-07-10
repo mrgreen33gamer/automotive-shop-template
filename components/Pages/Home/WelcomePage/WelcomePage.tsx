@@ -63,7 +63,7 @@ function CountingValue({
   );
 }
 
-function GaugeRow({
+function ScanCard({
   label,
   value,
   unit,
@@ -76,29 +76,33 @@ function GaugeRow({
 }) {
   const parsed = useMemo(() => parseGaugeValue(value), [value]);
   const pct = parsed.numeric !== null
-    ? Math.min(100, Math.max(8, Math.abs(parsed.numeric) > 100 ? 72 : Math.abs(parsed.numeric)))
-    : 55 + (index % 3) * 12;
+    ? Math.min(100, Math.max(14, Math.abs(parsed.numeric) > 100 ? 82 : Math.abs(parsed.numeric)))
+    : 40 + (index % 4) * 14;
+  const codes = ['P0', 'B1', 'C2', 'U3'];
 
   return (
-    <div className={styles.gauge}>
-      <div className={styles.gaugeHeader}>
-        <span className={styles.gaugeLabel}>{label}</span>
-        <CountingValue value={value} unit={unit} delay={0.45 + index * 0.12} />
+    <motion.div
+      className={styles.scanCard}
+      initial={{ opacity: 0, x: 16 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.45, delay: 0.35 + index * 0.08 }}
+    >
+      <div className={styles.scanLeft}>
+        <span className={styles.scanCode}>{codes[index % codes.length]}</span>
+        <span className={styles.scanLabel}>{label}</span>
       </div>
-      <div className={styles.meterTrack} aria-hidden="true">
-        <motion.div
-          className={styles.meterFill}
-          initial={{ width: '0%' }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 1.35, delay: 0.5 + index * 0.1, ease: [0.34, 1.1, 0.64, 1] }}
-        />
-        <div className={styles.meterTicks}>
-          {[0, 1, 2, 3, 4].map((t) => (
-            <span key={t} className={styles.meterTick} />
-          ))}
+      <div className={styles.scanRight}>
+        <CountingValue value={value} unit={unit} delay={0.4 + index * 0.1} />
+        <div className={styles.scanBar} aria-hidden="true">
+          <motion.span
+            className={styles.scanBarFill}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: pct / 100 }}
+            transition={{ duration: 1.1, delay: 0.5 + index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+          />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -307,9 +311,9 @@ const accentWord = "Redline";
           transition={{ duration: 0.7, delay: 0.28, ease: 'easeOut' }}
         >
           <PanelChrome>
-            <div className={styles.gaugeList}>
+            <div className={styles.scanStack}>
               {gauges.map((g, i) => (
-                <GaugeRow
+                <ScanCard
                   key={g.label}
                   label={g.label}
                   value={g.value}
@@ -319,20 +323,15 @@ const accentWord = "Redline";
               ))}
             </div>
             {toggles.length > 0 && (
-              <div className={styles.toggleList}>
+              <div className={styles.diagRow}>
                 {toggles.map((t, i) => (
                   <ToggleSwitch key={t.label} label={t.label} on={t.on} index={i} />
                 ))}
               </div>
             )}
-            <div className={styles.panelFooterStatic} aria-hidden="true">
-              <div className={styles.miniMeter}>
-                <span className={styles.miniMeterBar} />
-                <span className={styles.miniMeterBar} />
-                <span className={styles.miniMeterBar} />
-                <span className={styles.miniMeterBar} />
-                <span className={styles.miniMeterBar} />
-              </div>
+            <div className={styles.scanFooter} aria-hidden="true">
+              <span className={styles.scanPulse} />
+              <span className={styles.scanFootText}>OBD LIVE · NO CODES</span>
               <span className={styles.footerSerial}>{serial}</span>
             </div>
           </PanelChrome>

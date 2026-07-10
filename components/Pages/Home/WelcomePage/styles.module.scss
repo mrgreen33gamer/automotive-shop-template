@@ -403,144 +403,152 @@
   gap: 0.85rem;
 }
 
-.gaugeList {
+/* OBD scan cards — horizontal diagnostic rows (unique vs plant dials / bars) */
+.scanStack {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.45rem;
 }
 
-.gauge {
+.scanCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.55rem 0.65rem;
+  border-radius: 4px;
+  border: 1px solid rgba($orange, 0.18);
+  background:
+    linear-gradient(90deg, rgba($orange, 0.08) 0 3px, transparent 3px),
+    rgba(0, 0, 0, 0.28);
+}
+
+.scanLeft {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
-.gaugeHeader {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
+.scanCode {
+  font-family: $textFont;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: rgba($orange, 0.7);
 }
 
-.gaugeLabel {
+.scanLabel {
   font-family: $textFont;
   font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba($white, 0.48);
+  color: rgba($white, 0.55);
+}
+
+.scanRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  min-width: 0;
 }
 
 .gaugeValue {
   font-family: $titleFont;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 800;
   color: $orange;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .gaugeUnit {
-  margin-left: 0.2rem;
-  font-family: $textFont;
-  font-size: 0.65rem;
-  font-weight: 600;
+  margin-left: 0.15rem;
+  font-size: 0.58rem;
   color: rgba($orange, 0.7);
-  letter-spacing: 0.04em;
 }
 
-.meterTrack {
-  position: relative;
-  height: 10px;
-  border-radius: 3px;
-  background: rgba($white, 0.06);
-  border: 1px solid rgba($white, 0.08);
-  overflow: hidden;
-}
-
-.meterFill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, darken($orange, 12%), $orange, $lightorange);
-  box-shadow: 0 0 12px rgba($orange, 0.35);
-  border-radius: 2px;
-}
-
-.meterTicks {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 2px;
-  pointer-events: none;
-}
-
-.meterTick {
-  width: 1px;
-  height: 100%;
+.scanBar {
+  width: 100%;
+  height: 4px;
+  border-radius: 1px;
   background: rgba($white, 0.08);
+  overflow: hidden;
+  transform-origin: left center;
 }
 
-.toggleList {
+.scanBarFill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #991b1b, $orange, #fca5a5);
+  box-shadow: 0 0 8px rgba($orange, 0.4);
+  transform-origin: left center;
+}
+
+.diagRow {
   display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  padding-top: 0.25rem;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding-top: 0.35rem;
   border-top: 1px solid rgba($white, 0.06);
 }
 
 .toggle {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
+  display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.4rem 0.15rem;
+  gap: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid rgba($white, 0.1);
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .toggleLabel {
   font-family: $textFont;
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.58rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: rgba($white, 0.55);
-  text-align: left;
 }
 
 .toggleTrack {
-  width: 36px;
-  height: 18px;
-  border-radius: 999px;
+  width: 26px;
+  height: 12px;
+  border-radius: 2px;
   background: rgba($white, 0.1);
   border: 1px solid rgba($white, 0.12);
   position: relative;
-  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
 }
 
 .toggleThumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
+  top: 1px;
+  left: 1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
   background: rgba($white, 0.45);
   transition: transform 0.2s, background 0.2s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .toggleOn {
+  border-color: rgba($orange, 0.4);
+  background: rgba($orange, 0.1);
+
   .toggleTrack {
     background: rgba($orange, 0.25);
     border-color: rgba($orange, 0.45);
   }
 
   .toggleThumb {
-    transform: translateX(16px);
+    transform: translateX(12px);
     background: $orange;
-    box-shadow: 0 0 8px rgba($orange, 0.55);
   }
 
   .toggleState {
@@ -556,75 +564,45 @@
 
 .toggleState {
   font-family: $textFont;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  min-width: 1.75rem;
-  text-align: right;
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
 }
 
-.panelFooterStatic {
-  display: flex;
+.scanFooter {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.65rem 0 0.5rem;
-  border-top: 1px solid rgba($white, 0.05);
-  margin-top: 0.35rem;
+  gap: 0.45rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba($white, 0.06);
+  margin-top: 0.1rem;
 }
 
-.miniMeter {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 16px;
+.scanPulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3ddc84;
+  box-shadow: 0 0 8px rgba(61, 220, 132, 0.7);
+  animation: ledPulse 1.6s ease-in-out infinite;
 }
 
-.miniMeterBar {
-  width: 4px;
-  border-radius: 1px;
-  background: rgba($orange, 0.55);
-  animation: meterBounce 1.4s ease-in-out infinite;
-
-  &:nth-child(1) {
-    height: 40%;
-    animation-delay: 0s;
-  }
-  &:nth-child(2) {
-    height: 70%;
-    animation-delay: 0.12s;
-  }
-  &:nth-child(3) {
-    height: 100%;
-    animation-delay: 0.24s;
-  }
-  &:nth-child(4) {
-    height: 55%;
-    animation-delay: 0.36s;
-  }
-  &:nth-child(5) {
-    height: 80%;
-    animation-delay: 0.48s;
-  }
-}
-
-@keyframes meterBounce {
-  0%,
-  100% {
-    opacity: 0.45;
-    transform: scaleY(0.75);
-  }
-  50% {
-    opacity: 1;
-    transform: scaleY(1);
-  }
+.scanFootText {
+  font-family: $textFont;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba($white, 0.4);
 }
 
 .footerSerial {
   font-family: $textFont;
-  font-size: 0.58rem;
+  font-size: 0.55rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   color: rgba($white, 0.28);
+  white-space: nowrap;
 }
 
 /* === UNIQUENESS IDENTITY LAYER — automotive-shop-template === */
@@ -785,5 +763,82 @@
   .layout {
     padding-top: 5rem !important;
     padding-bottom: 2rem !important;
+  }
+}
+
+/* === MOBILE WELCOME STACK (fleet QA) === */
+/* Kill side-by-side hero chrome on phone: stack CTAs, rails, collages, dials */
+@media (max-width: 640px) {
+  .ctaRow,
+  .actions,
+  .heroCtas {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 22rem !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .ctaPrimary,
+  .ctaSecondary,
+  .ctaRow a,
+  .ctaRow button {
+    width: 100% !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .jobRail,
+  .jobStrip,
+  .shotRail {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+    max-width: 22rem !important;
+    margin: 0 auto !important;
+  }
+
+  .collageGrid,
+  .collage {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    min-height: 0 !important;
+    max-width: 22rem !important;
+    width: 100% !important;
+  }
+
+  .tileMain,
+  .tileSide,
+  .tile {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    min-height: 140px !important;
+  }
+
+  .plantDialGrid {
+    grid-template-columns: 1fr 1fr !important;
+    max-width: 100% !important;
+  }
+
+  .scanCard {
+    grid-template-columns: 1fr !important;
+    gap: 0.35rem !important;
+  }
+
+  .scanRight {
+    align-items: flex-start !important;
+  }
+
+  .materials,
+  .matGrid,
+  .swatchGrid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .statGrid,
+  .statsRow {
+    grid-template-columns: 1fr 1fr !important;
   }
 }
