@@ -73,14 +73,14 @@ export default function HomePage() {
       title: "AC & Heating Repair",
       body: "Blowing warm in summer or cold in winter? We diagnose and repair your vehicle's climate system fast, with upfront flat-rate pricing.",
       link: "/services/ac-heating-repair",
-      image: "/pages/home/services/service-1.jpg",
+      image: "/pages/home/welcome/before.jpg",
     },
     {
       icon: faWind,
       title: "Tire Service & Wheel Alignment",
       body: "Rotations, replacements, and precision wheel alignment. Even wear, better mileage, and a smoother ride in every lane.",
       link: "/services/tire-service",
-      image: "/pages/home/services/service-2.jpg",
+      image: "/pages/home/welcome/after.jpg",
     },
   ];
 
