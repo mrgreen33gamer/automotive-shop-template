@@ -35,7 +35,7 @@ const marqueeItems = [
   'Serving Middle Tennessee Since 2012',
   'Licensed & Insured · Franklin, TN',
 ];
-const footerLine = 'Licensed &amp; Insured · Franklin, TN';
+const footerLine = 'Licensed & Insured · Franklin, TN';
 const secondaryCtaLabel = 'Book Now';
 const secondaryCtaHref = '/contact';
 const hoursText = 'Mon–Sat · 7am–7pm';
