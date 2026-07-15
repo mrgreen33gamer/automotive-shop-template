@@ -1,61 +1,85 @@
-// Hero G — Live Control Panel / Dashboard
-// @use path assumes adaptation into components/Pages/Home/WelcomePage/
+// Auto Hero — Redline Bay
+// Photographic parallax stage + authentic technician photo card. Obsidian
+// stage, red identity, Racing Sans One display headline, engine-bay grain.
 @use '../../../../src/app/globalVariables.scss' as *;
 
 .hero {
   position: relative;
-  height: 100svh;
+  min-height: 100svh;
+  height: auto;
   background: $obsidian;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  isolation: isolate;
 
-  &::before {
+  // Fine scanline grain — keeps the dark photo reading as tactile shop
+  // material instead of flat black. Sits above the photo + scrim, below
+  // the content.
+  &::after {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: repeating-linear-gradient(
-      -55deg,
-      transparent,
-      transparent 22px,
-      rgba($white, 0.012) 22px,
-      rgba($white, 0.012) 23px
-    );
+    z-index: 2;
+    opacity: 0.78;
     pointer-events: none;
-    z-index: 0;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba($white, 0.015) 3px,
+      rgba($white, 0.015) 4px
+    );
   }
 }
 
-.shard {
+// ── Photographic parallax background ───────────────────────────────────────
+.bgLayer {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 46%;
-  height: 100%;
-  background: linear-gradient(
-    150deg,
-    transparent 0%,
-    rgba($orange, 0.02) 40%,
-    rgba($orange, 0.06) 100%
-  );
-  clip-path: polygon(28% 0%, 100% 0%, 100% 100%, 0% 100%);
-  pointer-events: none;
+  top: -8%;
+  left: 0;
+  width: 100%;
+  height: 116%;
+  z-index: 0;
+  will-change: transform;
+}
+
+.bgImage {
+  object-fit: cover;
+  object-position: center 38%;
+}
+
+// Obsidian-to-red scrim — keeps the shop-floor photo on-brand and the
+// headline legible. Darker on the left (text column), lighter on the right
+// (photo card). Radial glows echo the template's original red accent.
+.scrim {
+  position: absolute;
+  inset: 0;
   z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 40% at 67% 39%, rgba($orange, 0.14) 0%, rgba($orange, 0) 70%),
+    radial-gradient(ellipse 40% 50% at 78% 78%, rgba($white, 0.05) 0%, rgba($white, 0) 65%),
+    linear-gradient(100deg, rgba(9, 11, 16, 0.96) 0%, rgba(11, 13, 19, 0.88) 42%, rgba(13, 16, 22, 0.56) 74%, rgba(13, 16, 22, 0.4) 100%),
+    linear-gradient(180deg, rgba(9, 11, 16, 0.35) 0%, rgba(9, 11, 16, 0) 30%, rgba(9, 11, 16, 0.62) 100%);
 }
 
 .layout {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   max-width: 1380px;
+  width: 100%;
   margin: 0 auto;
-  padding: clamp(6rem, 11vh, 9rem) clamp(1.5rem, 5vw, 5rem) clamp(5rem, 9vh, 7rem);
+  padding: clamp(5.5rem, 11vh, 7.5rem) clamp(1.5rem, 5vw, 5rem) clamp(4rem, 8vh, 6rem);
   display: grid;
-  grid-template-columns: minmax(0, 560px) 1fr;
-  gap: clamp(2rem, 4vw, 5rem);
+  grid-template-columns: minmax(0, 0.95fr) minmax(300px, 460px);
+  gap: clamp(2.5rem, 4vw, 4.3rem);
   align-items: center;
 
   @media (max-width: 960px) {
     grid-template-columns: 1fr;
     text-align: center;
-    gap: 3rem;
+    gap: 2.5rem;
     padding: clamp(5rem, 9vh, 7rem) 1.5rem clamp(4rem, 7vh, 6rem);
   }
 }
@@ -112,11 +136,13 @@
 .headline {
   font-family: $titleFont;
   font-size: clamp(2.9rem, 5.5vw, 5.4rem);
-  font-weight: 800;
+  font-weight: 600;
   line-height: 0.95;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: $white;
   margin: 0;
+  transform: skewX(-0.5deg);
 }
 
 .accentLine {
@@ -127,7 +153,7 @@
   font-family: $textFont;
   font-size: clamp(1rem, 1.4vw, 1.15rem);
   line-height: 1.55;
-  color: rgba($white, 0.62);
+  color: rgba($white, 0.68);
   max-width: 34rem;
   margin: 0;
 
@@ -158,7 +184,7 @@
   background: $orange;
   text-decoration: none;
   padding: 0.85rem 1.35rem;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: background 0.18s, transform 0.16s;
 
   &:hover {
@@ -174,16 +200,16 @@
   font-family: $headerFont;
   font-size: 0.92rem;
   font-weight: 700;
-  color: rgba($white, 0.85);
+  color: rgba($white, 0.9);
   text-decoration: none;
   padding: 0.85rem 1.2rem;
-  border-radius: 8px;
-  border: 1px solid rgba($white, 0.14);
+  border-radius: 12px;
+  border: 1px solid rgba($white, 0.18);
   transition: border-color 0.18s, background 0.18s;
 
   &:hover {
-    border-color: rgba($white, 0.28);
-    background: rgba($white, 0.04);
+    border-color: rgba($white, 0.32);
+    background: rgba($white, 0.05);
   }
 }
 
@@ -206,639 +232,165 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba($white, 0.55);
+  color: rgba($white, 0.6);
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  border: 1px solid rgba($white, 0.08);
-  background: rgba($white, 0.03);
+  border: 1px solid rgba($white, 0.1);
+  background: rgba($white, 0.04);
 
   svg {
-    color: rgba($orange, 0.8);
+    color: rgba($orange, 0.85);
   }
 }
 
+// ── Authentic technician photo card (replaces the OBD dashboard panel) ─────
 .visual {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 320px;
+  min-height: 340px;
 
   @media (max-width: 960px) {
-    min-height: auto;
+    min-height: 0;
+    margin-top: 0.25rem;
   }
 }
 
-// ── Service Bay Board ──────────────────────────────────────────────────────
-
-.panel {
-  width: min(100%, 400px);
-  background: linear-gradient(165deg, #1a1d22 0%, #121418 55%, #0e1014 100%);
-  border: 1px solid rgba($white, 0.1);
-  border-radius: 10px;
+.photoCard {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  aspect-ratio: 4 / 5;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  border: 1px solid rgba($orange, 0.32);
   box-shadow:
-    inset 0 1px 0 rgba($white, 0.06),
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 28px 56px rgba(0, 0, 0, 0.45);
-  overflow: hidden;
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 30px 60px -20px rgba(0, 0, 0, 0.7),
+    0 0 0 6px rgba($orange, 0.06);
+
+  @media (max-width: 960px) {
+    max-width: 360px;
+    aspect-ratio: 4 / 3;
+  }
 }
 
-.bayBoard {
-  border-radius: 4px;
-  border: 2px solid rgba($orange, 0.35);
+.photo {
+  object-fit: cover;
+  object-position: center;
+}
+
+// Obsidian-to-red glaze so the badge + spec card stay readable over the photo
+.photoGlaze {
+  position: absolute;
+  inset: 0;
   background:
-    linear-gradient(90deg, rgba($orange, 0.06) 0 4px, transparent 4px),
-    linear-gradient(165deg, #221816 0%, #141010 55%, #100c0c 100%);
+    linear-gradient(180deg, rgba(9, 11, 16, 0) 42%, rgba(9, 11, 16, 0.78) 100%),
+    linear-gradient(300deg, rgba($orange, 0.2) 0%, rgba($orange, 0) 46%);
 }
 
-.bayDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: $orange;
-  box-shadow: 0 0 8px rgba($orange, 0.6);
-  flex-shrink: 0;
-}
-
-.bayRow {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.35rem;
-  padding: 0.5rem 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba($white, 0.06);
-}
-
-.bayChip {
-  text-align: center;
-  font-family: $textFont;
-  font-size: 0.55rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 0.35rem 0.2rem;
-  border-radius: 3px;
-  border: 1px solid rgba($white, 0.1);
-}
-
-.bayOpen {
-  color: #3ddc84;
-  background: rgba(#3ddc84, 0.1);
-  border-color: rgba(#3ddc84, 0.35);
-}
-
-.bayBusy {
-  color: rgba($orange, 0.9);
-  background: rgba($orange, 0.12);
-  border-color: rgba($orange, 0.4);
-}
-
-.bayBoard .panelBezel {
-  background: linear-gradient(180deg, #3a2018 0%, #221410 100%);
-  border-bottom-color: rgba($orange, 0.2);
-}
-
-.bayBoard .panelTitle {
-  letter-spacing: 0.14em;
-  color: rgba($orange, 0.85);
-}
-
-.bayBoard .meterFill {
-  background: linear-gradient(90deg, #991b1b, $orange, #fca5a5);
-}
-
-.panelBezel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.55rem 0.75rem;
-  background: linear-gradient(180deg, #2a2e35 0%, #1c1f25 100%);
-  border-bottom: 1px solid rgba($white, 0.08);
-}
-
-.screw {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #6a6f78, #2e3238 70%);
-  box-shadow: inset 0 1px 1px rgba($white, 0.15), 0 1px 2px rgba(0, 0, 0, 0.5);
-  flex-shrink: 0;
-
-  &::after {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      135deg,
-      transparent 42%,
-      rgba(0, 0, 0, 0.45) 45%,
-      rgba(0, 0, 0, 0.45) 55%,
-      transparent 58%
-    );
-    border-radius: 50%;
-  }
-}
-
-.panelTitle {
-  flex: 1;
-  text-align: center;
-  font-family: $textFont;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: rgba($white, 0.45);
-}
-
-.panelStatus {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 0.9rem;
-  background: rgba(0, 0, 0, 0.25);
-  border-bottom: 1px solid rgba($white, 0.05);
-}
-
-.statusLed {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #3ddc84;
-  box-shadow: 0 0 8px rgba(61, 220, 132, 0.75);
-  animation: ledPulse 2s ease-in-out infinite;
-}
-
-@keyframes ledPulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.45;
-  }
-}
-
-.statusText {
-  font-family: $textFont;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: rgba($white, 0.5);
-  flex: 1;
-}
-
-.statusTime {
-  font-family: $textFont;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: $orange;
-}
-
-.panelBody {
-  padding: 1rem 1rem 0.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-/* OBD scan cards — horizontal diagnostic rows (unique vs plant dials / bars) */
-.scanStack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.scanCard {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  gap: 0.65rem;
-  align-items: center;
-  padding: 0.55rem 0.65rem;
-  border-radius: 4px;
-  border: 1px solid rgba($orange, 0.18);
-  background:
-    linear-gradient(90deg, rgba($orange, 0.08) 0 3px, transparent 3px),
-    rgba(0, 0, 0, 0.28);
-}
-
-.scanLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.scanCode {
-  font-family: $textFont;
-  font-size: 0.55rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: rgba($orange, 0.7);
-}
-
-.scanLabel {
-  font-family: $textFont;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba($white, 0.55);
-}
-
-.scanRight {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.3rem;
-  min-width: 0;
-}
-
-.gaugeValue {
-  font-family: $titleFont;
-  font-size: 1rem;
-  font-weight: 800;
-  color: $orange;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
-
-.gaugeUnit {
-  margin-left: 0.15rem;
-  font-size: 0.58rem;
-  color: rgba($orange, 0.7);
-}
-
-.scanBar {
-  width: 100%;
-  height: 4px;
-  border-radius: 1px;
-  background: rgba($white, 0.08);
-  overflow: hidden;
-  transform-origin: left center;
-}
-
-.scanBarFill {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #991b1b, $orange, #fca5a5);
-  box-shadow: 0 0 8px rgba($orange, 0.4);
-  transform-origin: left center;
-}
-
-.diagRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  padding-top: 0.35rem;
-  border-top: 1px solid rgba($white, 0.06);
-}
-
-.toggle {
+.photoBadge {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.5rem;
-  border-radius: 3px;
-  border: 1px solid rgba($white, 0.1);
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.toggleLabel {
+  gap: 0.5rem;
   font-family: $textFont;
-  font-size: 0.58rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba($white, 0.55);
+  color: $white;
+  background: rgba(9, 11, 16, 0.65);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba($orange, 0.35);
+  border-radius: $radius-pill;
+  padding: 0.4rem 0.85rem;
 }
 
-.toggleTrack {
-  width: 26px;
-  height: 12px;
-  border-radius: 2px;
-  background: rgba($white, 0.1);
-  border: 1px solid rgba($white, 0.12);
-  position: relative;
+.photoBadgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $orange;
+  box-shadow: 0 0 8px 1px rgba($orange, 0.8);
   flex-shrink: 0;
 }
 
-.toggleThumb {
+.specCard {
   position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 8px;
-  height: 8px;
-  border-radius: 1px;
-  background: rgba($white, 0.45);
-  transition: transform 0.2s, background 0.2s;
-}
-
-.toggleOn {
-  border-color: rgba($orange, 0.4);
-  background: rgba($orange, 0.1);
-
-  .toggleTrack {
-    background: rgba($orange, 0.25);
-    border-color: rgba($orange, 0.45);
-  }
-
-  .toggleThumb {
-    transform: translateX(12px);
-    background: $orange;
-  }
-
-  .toggleState {
-    color: $orange;
-  }
-}
-
-.toggleOff {
-  .toggleState {
-    color: rgba($white, 0.3);
-  }
-}
-
-.toggleState {
-  font-family: $textFont;
-  font-size: 0.52rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.scanFooter {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
+  left: 0.9rem;
+  right: 0.9rem;
+  bottom: 0.9rem;
+  display: flex;
+  flex-direction: column;
   gap: 0.45rem;
-  padding-top: 0.55rem;
-  border-top: 1px solid rgba($white, 0.06);
-  margin-top: 0.1rem;
+  padding: 0.85rem 1rem;
+  border-radius: $radius-md;
+  background: rgba(9, 11, 16, 0.62);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba($orange, 0.28);
 }
 
-.scanPulse {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #3ddc84;
-  box-shadow: 0 0 8px rgba(61, 220, 132, 0.7);
-  animation: ledPulse 1.6s ease-in-out infinite;
-}
-
-.scanFootText {
-  font-family: $textFont;
-  font-size: 0.55rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: rgba($white, 0.4);
-}
-
-.footerSerial {
-  font-family: $textFont;
-  font-size: 0.55rem;
+.specRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: $headerFont;
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  color: rgba($white, 0.28);
-  white-space: nowrap;
-}
+  color: rgba($white, 0.95);
 
-/* === UNIQUENESS IDENTITY LAYER — automotive-shop-template === */
-/* Auto-generated visual identity so shared archetypes diverge per brand. */
-
-.hero {
-  min-height: 100svh !important;
-  height: auto !important;
-}
-
-.layout {
-  grid-template-columns: minmax(0, 0.95fr) 1fr !important;
-  gap: clamp(2.81rem, 4vw, 4.3100000000000005rem) !important;
-  padding-top: clamp(5.64rem, 11vh, 7.64rem) !important;
-}
-
-.shard {
-  clip-path: polygon(18% 0%, 100% 0%, 100% 100%, 0% 100%) !important;
-  opacity: 0.62 !important;
-}
-
-.headline {
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
-  font-weight: 600 !important;
-  transform: skewX(-0.5deg);
-}
-
-.badge {
-  border-radius: 999px !important;
-}
-
-.chip {
-  border-radius: 999px !important;
-}
-
-.ctaPrimary,
-.ctaSecondary {
-  border-radius: 12px !important;
-}
-
-.visual {
-  transform: scale(1.052);
-}
-
-.statCard,
-.console,
-.dialCard,
-.baFrame,
-.tile,
-.jobCard,
-.stripCard,
-.metricBar {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
-}
-
-/* end identity layer */
-
-/* === HERO PATTERN UNIQUENESS — automotive-shop-template === */
-.hero {
-  &::before {
-    content: '' !important;
-    position: absolute !important;
-    inset: 0 !important;
-    background-image: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba($white, 0.015) 3px, rgba($white, 0.015) 4px) !important;
-    background-size: auto !important;
-    opacity: 0.78 !important;
-    pointer-events: none !important;
-    z-index: 0 !important;
-  }
-
-  &::after {
-    content: '' !important;
-    position: absolute !important;
-    inset: 0 !important;
-    background-image: radial-gradient(ellipse 50% 40% at 67% 39%, rgba($orange, 0.065), transparent 70%), radial-gradient(ellipse 40% 50% at 78% 78%, rgba($white, 0.03), transparent 65%) !important;
-    pointer-events: none !important;
-    z-index: 0 !important;
+  svg {
+    color: $lightorange;
+    flex-shrink: 0;
   }
 }
-/* end hero pattern */
 
-/* === MOBILE HERO FOLD SAFETY (fleet QA) === */
 @media (max-width: 640px) {
-  .hero,
-  .section,
-  .welcome {
+  .hero {
     min-height: 100svh;
-    height: auto !important;
+    height: auto;
   }
-  .headline,
-  .title,
-  .heroTitle {
-    font-size: clamp(2.05rem, 9vw, 2.85rem) !important;
-    line-height: 1.05 !important;
-  }
-  .layout,
-  .heroInner,
-  .contentWrap {
-    gap: 1.25rem !important;
-    padding-bottom: 2rem !important;
-  }
-  .ctaRow,
-  .actions,
-  .heroCtas {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .visual,
-  .heroVisual,
-  .meter,
-  .statGrid {
-    min-height: 0 !important;
-  }
-}
 
-/* === TABLET + MOBILE HERO VISUAL DEFER (fleet QA) === */
-/* Hide side dials/meters on tablet & phone so the hero fold stays clean */
-@media (max-width: 960px) {
-  .visual,
-  .heroVisual,
-  .meterWrap,
-  .rightCol,
-  .heroArt {
-    display: none !important;
-  }
-}
-
-/* === MOBILE HERO COPY TIGHTEN (fleet QA) === */
-@media (max-width: 640px) {
-  .sub,
-  .heroSub,
-  .description {
-    font-size: 0.9rem !important;
-    line-height: 1.45 !important;
-    max-width: 34ch !important;
-  }
-  .chips {
-    display: none !important; /* trust chips below fold on phone — CTAs first */
-  }
-}
-
-/* === MOBILE SINGLE COLUMN FORCE (fleet QA) === */
-@media (max-width: 960px) {
-  .layout,
-  .heroLayout,
-  .grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-@media (max-width: 640px) {
-  .hero,
-  .section {
-    height: auto !important;
-    min-height: 100svh !important;
-    overflow: visible !important;
-  }
   .layout {
-    padding-top: 5rem !important;
-    padding-bottom: 2rem !important;
+    padding-top: 5.5rem;
+    padding-bottom: 2.5rem;
+    gap: 1.5rem;
   }
-}
 
-/* === MOBILE WELCOME STACK (fleet QA) === */
-/* Kill side-by-side hero chrome on phone: stack CTAs, rails, collages, dials */
-@media (max-width: 640px) {
-  .ctaRow,
-  .actions,
-  .heroCtas {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    width: 100% !important;
-    max-width: 22rem !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+  .headline {
+    font-size: clamp(2.05rem, 9vw, 2.85rem);
+    line-height: 1.05;
+  }
+
+  .sub {
+    font-size: 0.9rem;
+    line-height: 1.45;
+    max-width: 34ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ctaRow {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 22rem;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .ctaPrimary,
-  .ctaSecondary,
-  .ctaRow a,
-  .ctaRow button {
-    width: 100% !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
+  .ctaSecondary {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
   }
 
-  .jobRail,
-  .jobStrip,
-  .shotRail {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 0.65rem !important;
-    width: 100% !important;
-    max-width: 22rem !important;
-    margin: 0 auto !important;
-  }
-
-  .collageGrid,
-  .collage {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto !important;
-    min-height: 0 !important;
-    max-width: 22rem !important;
-    width: 100% !important;
-  }
-
-  .tileMain,
-  .tileSide,
-  .tile {
-    grid-column: auto !important;
-    grid-row: auto !important;
-    min-height: 140px !important;
-  }
-
-  .plantDialGrid {
-    grid-template-columns: 1fr 1fr !important;
-    max-width: 100% !important;
-  }
-
-  .scanCard {
-    grid-template-columns: 1fr !important;
-    gap: 0.35rem !important;
-  }
-
-  .scanRight {
-    align-items: flex-start !important;
-  }
-
-  .materials,
-  .matGrid,
-  .swatchGrid {
-    grid-template-columns: 1fr 1fr !important;
-  }
-
-  .statGrid,
-  .statsRow {
-    grid-template-columns: 1fr 1fr !important;
+  .chips {
+    justify-content: center;
   }
 }

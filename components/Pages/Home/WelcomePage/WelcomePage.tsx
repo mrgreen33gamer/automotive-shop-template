@@ -1,162 +1,29 @@
-// _archetype-library/hero-g-dashboard/Component.tsx
-//
-// Hero G: Live Control Panel — industrial chrome, counting gauges from props,
-// toggle switches, small meters. Framer-motion for counter animations.
+// Auto Hero — Redline Bay
+// Photographic parallax stage + an authentic technician photo card replaces
+// the OBD "Service Bay Board" dashboard panel. Real garage/engine-bay
+// imagery, red-on-obsidian identity, Racing Sans One display headline.
+// Photos live in /public/pages/home/welcome and are shared with other
+// sections of the page (before/after slider, materials grid, texture fills).
 'use client';
-import React, { useEffect, useMemo, useState } from 'react';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import { PhoneIcon, ChevronIcon, CheckIcon } from './_shared/icons';
 import styles from './styles.module.scss';
 
-function parseGaugeValue(raw: string): { numeric: number | null; prefix: string; suffix: string } {
-  const match = raw.match(/^([^0-9.-]*)(-?[\d.]+)(.*)$/);
-  if (!match) return { numeric: null, prefix: '', suffix: raw };
-  const num = parseFloat(match[2]);
-  if (Number.isNaN(num)) return { numeric: null, prefix: '', suffix: raw };
-  return { numeric: num, prefix: match[1], suffix: match[3] };
-}
-
-function CountingValue({
-  value,
-  unit,
-  delay = 0,
-}: {
-  value: string;
-  unit?: string;
-  delay?: number;
-}) {
-  const parsed = useMemo(() => parseGaugeValue(value), [value]);
-  const motionVal = useMotionValue(0);
-  const display = useTransform(motionVal, (v) => {
-    if (parsed.numeric === null) return value;
-    const decimals = String(parsed.numeric).includes('.')
-      ? (String(parsed.numeric).split('.')[1]?.length ?? 0)
-      : 0;
-    const rounded = decimals > 0 ? v.toFixed(decimals) : String(Math.round(v));
-    return `${parsed.prefix}${rounded}${parsed.suffix}`;
-  });
-  const [text, setText] = useState(parsed.numeric === null ? value : `${parsed.prefix}0${parsed.suffix}`);
-
-  useEffect(() => {
-    if (parsed.numeric === null) {
-      setText(value);
-      return;
-    }
-    const controls = animate(motionVal, parsed.numeric, {
-      duration: 1.6,
-      delay,
-      ease: [0.22, 1, 0.36, 1],
-    });
-    const unsub = display.on('change', (v) => setText(v));
-    return () => {
-      controls.stop();
-      unsub();
-    };
-  }, [parsed.numeric, value, delay, motionVal, display]);
-
-  return (
-    <span className={styles.gaugeValue}>
-      {text}
-      {unit ? <span className={styles.gaugeUnit}>{unit}</span> : null}
-    </span>
-  );
-}
-
-function ScanCard({
-  label,
-  value,
-  unit,
-  index,
-}: {
-  label: string;
-  value: string;
-  unit?: string;
-  index: number;
-}) {
-  const parsed = useMemo(() => parseGaugeValue(value), [value]);
-  const pct = parsed.numeric !== null
-    ? Math.min(100, Math.max(14, Math.abs(parsed.numeric) > 100 ? 82 : Math.abs(parsed.numeric)))
-    : 40 + (index % 4) * 14;
-  const codes = ['P0', 'B1', 'C2', 'U3'];
-
-  return (
-    <motion.div
-      className={styles.scanCard}
-      initial={{ opacity: 0, x: 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.45, delay: 0.35 + index * 0.08 }}
-    >
-      <div className={styles.scanLeft}>
-        <span className={styles.scanCode}>{codes[index % codes.length]}</span>
-        <span className={styles.scanLabel}>{label}</span>
-      </div>
-      <div className={styles.scanRight}>
-        <CountingValue value={value} unit={unit} delay={0.4 + index * 0.1} />
-        <div className={styles.scanBar} aria-hidden="true">
-          <motion.span
-            className={styles.scanBarFill}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: pct / 100 }}
-            transition={{ duration: 1.1, delay: 0.5 + index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-          />
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function ToggleSwitch({
-  label,
-  on,
-  index,
-}: {
-  label: string;
-  on: boolean;
-  index: number;
-}) {
-  return (
-    <motion.div
-      className={`${styles.toggle} ${on ? styles.toggleOn : styles.toggleOff}`}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.7 + index * 0.08 }}
-    >
-      <span className={styles.toggleLabel}>{label}</span>
-      <span className={styles.toggleTrack} aria-hidden="true">
-        <span className={styles.toggleThumb} />
-      </span>
-      <span className={styles.toggleState}>{on ? 'ON' : 'OFF'}</span>
-    </motion.div>
-  );
-}
-
-function PanelChrome({ children }: { children: React.ReactNode }) {
-  return (
-    <div className={`${styles.panel} ${styles.bayBoard}`}>
-      <div className={styles.panelBezel} aria-hidden="true">
-        <span className={styles.bayDot} />
-        <span className={styles.panelTitle}>SERVICE BAY BOARD</span>
-        <span className={styles.bayDot} />
-      </div>
-      <div className={styles.bayRow} aria-hidden="true">
-        {[1, 2, 3, 4].map((n) => (
-          <span key={n} className={`${styles.bayChip} ${n <= 3 ? styles.bayOpen : styles.bayBusy}`}>
-            Bay {n}
-          </span>
-        ))}
-      </div>
-      <div className={styles.panelStatus} aria-hidden="true">
-        <span className={styles.statusLed} />
-        <span className={styles.statusText}>3 BAYS OPEN</span>
-        <span className={styles.statusTime}>ASE</span>
-      </div>
-      <div className={styles.panelBody}>{children}</div>
-    </div>
-  );
-}
-
 export default function WelcomePage() {
+  const reduceMotion = useReducedMotion();
+  const heroRef = useRef<HTMLElement>(null);
+
+  // Scroll-linked parallax on the background photo. Disabled under reduced-motion.
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', reduceMotion ? '0%' : '14%']);
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1.06, reduceMotion ? 1.06 : 1.15]);
+
 const badgeText = 'Franklin\'s Most Trusted Auto Shop — Since 2012';
 const headlineLines = [
   'Fast Fix.',
@@ -220,12 +87,6 @@ const authorName = "Angela R.";
 const authorMeta = "Brake service · Georgetown";
 const rating = 5;
 const schematicLabel = "Redline schematic";
-const gauges = [
-  { label: "Jobs", value: "8,500+" },
-  { label: "Rating", value: "4.8 ★" },
-  { label: "Bay wait", value: "Often same day" },
-  { label: "Warranty", value: "12/12k" }
-];
 const toggles = [
   { label: "Licensed crew", on: true },
   { label: "Same-week", on: true },
@@ -235,13 +96,25 @@ const textureSrc = '/pages/home/welcome/hero-main.jpg';
 const textureAlt = 'Texture';
 const accentWord = "Redline";
 
-  // Stable serial for SSR/hydration — avoid Math.random in render of serial
-  // by using a fixed-looking decorative suffix derived from gauge count.
-  const serial = `CH-${String(gauges.length).padStart(2, '0')}`;
-
   return (
-    <section className={styles.hero} aria-label="Hero">
-      <div className={styles.shard} aria-hidden="true" />
+    <section ref={heroRef} className={styles.hero} aria-label="Hero">
+      {/* Photographic parallax background — real shop-floor scene */}
+      <motion.div
+        className={styles.bgLayer}
+        style={{ y: bgY, scale: bgScale }}
+        aria-hidden="true"
+      >
+        <Image
+          src="/pages/home/welcome/after.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className={styles.bgImage}
+        />
+      </motion.div>
+      {/* Obsidian-to-red scrim keeps the headline legible and on-brand */}
+      <div className={styles.scrim} aria-hidden="true" />
 
       <div className={styles.layout}>
         <div className={styles.content}>
@@ -304,37 +177,38 @@ const accentWord = "Redline";
           </motion.div>
         </div>
 
+        {/* Authentic technician photo — the ownable image, framed as a spec card */}
         <motion.div
           className={styles.visual}
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.28, ease: 'easeOut' }}
         >
-          <PanelChrome>
-            <div className={styles.scanStack}>
-              {gauges.map((g, i) => (
-                <ScanCard
-                  key={g.label}
-                  label={g.label}
-                  value={g.value}
-                  unit={undefined}
-                  index={i}
-                />
-              ))}
+          <div className={styles.photoCard}>
+            <Image
+              src="/pages/home/welcome/before.jpg"
+              alt="ASE certified technician tightening a bolt deep in an engine bay at the shop"
+              fill
+              priority
+              sizes="(max-width: 960px) 88vw, 460px"
+              className={styles.photo}
+            />
+            <div className={styles.photoGlaze} aria-hidden="true" />
+
+            <div className={styles.photoBadge}>
+              <span className={styles.photoBadgeDot} />
+              ASE-Certified Tech · On-Site
             </div>
-            {toggles.length > 0 && (
-              <div className={styles.diagRow}>
-                {toggles.map((t, i) => (
-                  <ToggleSwitch key={t.label} label={t.label} on={t.on} index={i} />
-                ))}
-              </div>
-            )}
-            <div className={styles.scanFooter} aria-hidden="true">
-              <span className={styles.scanPulse} />
-              <span className={styles.scanFootText}>OBD LIVE · NO CODES</span>
-              <span className={styles.footerSerial}>{serial}</span>
+
+            <div className={styles.specCard}>
+              <span className={styles.specRow}>
+                <CheckIcon size={10} /> Flat-rate pricing
+              </span>
+              <span className={styles.specRow}>
+                <CheckIcon size={10} /> 3-Yr / 36k-Mile warranty
+              </span>
             </div>
-          </PanelChrome>
+          </div>
         </motion.div>
       </div>
     </section>
